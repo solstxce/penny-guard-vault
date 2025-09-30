@@ -26,7 +26,7 @@ All colors MUST be HSL.
     --muted: 220 15% 96%;
     --muted-foreground: 220 10% 45%;
 
-    --accent: 160 84% 35%;
+    --accent: 217 91% 45%;
     --accent-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
@@ -42,7 +42,7 @@ All colors MUST be HSL.
     --radius: 0.75rem;
 
     --chart-1: 217 91% 35%;
-    --chart-2: 160 84% 35%;
+    --chart-2: 217 91% 55%;
     --chart-3: 38 92% 50%;
     --chart-4: 280 65% 50%;
     --chart-5: 340 75% 50%;
@@ -69,7 +69,7 @@ All colors MUST be HSL.
     --muted: 220 20% 15%;
     --muted-foreground: 220 10% 60%;
 
-    --accent: 160 60% 45%;
+    --accent: 217 91% 55%;
     --accent-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
@@ -83,7 +83,7 @@ All colors MUST be HSL.
     --ring: 217 91% 50%;
 
     --chart-1: 217 91% 50%;
-    --chart-2: 160 60% 45%;
+    --chart-2: 217 91% 65%;
     --chart-3: 38 92% 50%;
     --chart-4: 280 65% 55%;
     --chart-5: 340 75% 55%;
