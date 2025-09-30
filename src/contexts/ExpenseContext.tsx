@@ -3,14 +3,17 @@ import { AppData, Expense, MonthlyBudget } from "@/types/expense";
 import { saveData, loadData } from "@/utils/storage";
 import { useAuth } from "./AuthContext";
 import { toast } from "@/hooks/use-toast";
+import { Currency } from "@/utils/currency";
 
 interface ExpenseContextType {
   expenses: Expense[];
   budgets: MonthlyBudget;
+  currency: Currency;
   addExpense: (expense: Omit<Expense, "id" | "createdAt">) => Promise<void>;
   updateExpense: (id: string, expense: Partial<Expense>) => Promise<void>;
   deleteExpense: (id: string) => Promise<void>;
   setBudget: (category: string, amount: number) => Promise<void>;
+  setCurrency: (currency: Currency) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -20,12 +23,13 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
   const { password, isAuthenticated } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [budgets, setBudgets] = useState<MonthlyBudget>({});
+  const [currency, setCurrencyState] = useState<Currency>("INR");
   const [isLoading, setIsLoading] = useState(true);
 
-  const saveToStorage = useCallback(async (data: AppData) => {
+  const saveToStorage = useCallback(async (data: AppData, curr: Currency) => {
     if (password) {
       try {
-        await saveData(data, password);
+        await saveData({ ...data, currency: curr }, password);
       } catch (error) {
         toast({
           title: "Save Failed",
@@ -42,6 +46,7 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
         .then((data) => {
           setExpenses(data.expenses);
           setBudgets(data.budgets);
+          setCurrencyState(data.currency || "INR");
           setIsLoading(false);
         })
         .catch(() => {
@@ -63,7 +68,7 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
     };
     const newExpenses = [...expenses, newExpense];
     setExpenses(newExpenses);
-    await saveToStorage({ expenses: newExpenses, budgets });
+    await saveToStorage({ expenses: newExpenses, budgets }, currency);
     toast({
       title: "Expense Added",
       description: "Your expense has been recorded.",
@@ -75,7 +80,7 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
       exp.id === id ? { ...exp, ...updatedFields } : exp
     );
     setExpenses(newExpenses);
-    await saveToStorage({ expenses: newExpenses, budgets });
+    await saveToStorage({ expenses: newExpenses, budgets }, currency);
     toast({
       title: "Expense Updated",
       description: "Your expense has been updated.",
@@ -85,7 +90,7 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
   const deleteExpense = async (id: string) => {
     const newExpenses = expenses.filter((exp) => exp.id !== id);
     setExpenses(newExpenses);
-    await saveToStorage({ expenses: newExpenses, budgets });
+    await saveToStorage({ expenses: newExpenses, budgets }, currency);
     toast({
       title: "Expense Deleted",
       description: "Your expense has been removed.",
@@ -95,10 +100,19 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
   const setBudget = async (category: string, amount: number) => {
     const newBudgets = { ...budgets, [category]: amount };
     setBudgets(newBudgets);
-    await saveToStorage({ expenses, budgets: newBudgets });
+    await saveToStorage({ expenses, budgets: newBudgets }, currency);
     toast({
       title: "Budget Updated",
       description: `Budget for ${category} has been set.`,
+    });
+  };
+
+  const setCurrency = async (newCurrency: Currency) => {
+    setCurrencyState(newCurrency);
+    await saveToStorage({ expenses, budgets }, newCurrency);
+    toast({
+      title: "Currency Updated",
+      description: `Currency changed to ${newCurrency}.`,
     });
   };
 
@@ -107,10 +121,12 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
       value={{
         expenses,
         budgets,
+        currency,
         addExpense,
         updateExpense,
         deleteExpense,
         setBudget,
+        setCurrency,
         isLoading,
       }}
     >

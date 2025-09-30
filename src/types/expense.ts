@@ -16,6 +16,7 @@ export interface MonthlyBudget {
 export interface AppData {
   expenses: Expense[];
   budgets: MonthlyBudget;
+  currency?: "USD" | "INR";
 }
 
 export const EXPENSE_CATEGORIES = [

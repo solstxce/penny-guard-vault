@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, TrendingUp, TrendingDown, PieChart } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell } from "recharts";
+import { formatCurrency } from "@/utils/currency";
 
 export default function Dashboard() {
-  const { expenses, budgets, isLoading } = useExpenses();
+  const { expenses, budgets, currency, isLoading } = useExpenses();
 
   const monthlyData = useMemo(() => {
     const now = new Date();
@@ -55,7 +56,7 @@ export default function Dashboard() {
   const isOverBudget = remaining < 0;
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold">Dashboard</h2>
         <p className="text-muted-foreground">{format(new Date(), "MMMM yyyy")}</p>
@@ -70,7 +71,7 @@ export default function Dashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalSpent.toFixed(2)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(totalSpent, currency)}</div>
             <p className="text-xs text-muted-foreground">
               {monthExpenses.length} transactions
             </p>
@@ -85,7 +86,7 @@ export default function Dashboard() {
             <PieChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalBudget.toFixed(2)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(totalBudget, currency)}</div>
             <p className="text-xs text-muted-foreground">Across all categories</p>
           </CardContent>
         </Card>
@@ -107,7 +108,7 @@ export default function Dashboard() {
                 isOverBudget ? "text-destructive" : "text-accent"
               }`}
             >
-              ${Math.abs(remaining).toFixed(2)}
+              {formatCurrency(Math.abs(remaining), currency)}
             </div>
             <p className="text-xs text-muted-foreground">
               {isOverBudget ? "Over budget" : "Under budget"}
@@ -140,10 +141,10 @@ export default function Dashboard() {
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `$${value}`}
+                  tickFormatter={(value) => formatCurrency(value, currency)}
                 />
                 <Tooltip
-                  formatter={(value) => `$${Number(value).toFixed(2)}`}
+                  formatter={(value) => formatCurrency(Number(value), currency)}
                   contentStyle={{
                     background: "hsl(var(--card))",
                     border: "1px solid hsl(var(--border))",
@@ -191,7 +192,7 @@ export default function Dashboard() {
                         {expense.category} • {format(new Date(expense.date), "MMM d")}
                       </p>
                     </div>
-                    <p className="font-semibold">${expense.amount.toFixed(2)}</p>
+                    <p className="font-semibold">{formatCurrency(expense.amount, currency)}</p>
                   </div>
                 ))}
             </div>

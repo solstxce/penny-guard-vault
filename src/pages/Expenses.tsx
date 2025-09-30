@@ -22,9 +22,10 @@ import {
 import { Plus, Trash2, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { EXPENSE_CATEGORIES } from "@/types/expense";
+import { formatCurrency } from "@/utils/currency";
 
 export default function Expenses() {
-  const { expenses, addExpense, deleteExpense, isLoading } = useExpenses();
+  const { expenses, addExpense, deleteExpense, currency, isLoading } = useExpenses();
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     amount: "",
@@ -64,7 +65,7 @@ export default function Expenses() {
   }
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">All Expenses</h2>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -164,7 +165,7 @@ export default function Expenses() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <p className="text-lg font-bold">${expense.amount.toFixed(2)}</p>
+                  <p className="text-lg font-bold">{formatCurrency(expense.amount, currency)}</p>
                   <Button
                     variant="ghost"
                     size="icon"

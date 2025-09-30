@@ -21,9 +21,10 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Trash2, RefreshCcw } from "lucide-react";
 import { EXPENSE_CATEGORIES } from "@/types/expense";
+import { formatCurrency } from "@/utils/currency";
 
 export default function Recurring() {
-  const { expenses, addExpense, deleteExpense, isLoading } = useExpenses();
+  const { expenses, addExpense, deleteExpense, currency, isLoading } = useExpenses();
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     amount: "",
@@ -62,7 +63,7 @@ export default function Recurring() {
   }
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold">Recurring Expenses</h2>
@@ -165,10 +166,10 @@ export default function Recurring() {
               <div className="flex items-center justify-between">
                 <p className="text-sm text-muted-foreground">Total Monthly Recurring</p>
                 <p className="text-2xl font-bold text-primary">
-                  $
-                  {recurringExpenses
-                    .reduce((sum, exp) => sum + exp.amount, 0)
-                    .toFixed(2)}
+                  {formatCurrency(
+                    recurringExpenses.reduce((sum, exp) => sum + exp.amount, 0),
+                    currency
+                  )}
                 </p>
               </div>
             </CardContent>
@@ -198,7 +199,7 @@ export default function Recurring() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <p className="text-lg font-bold">${expense.amount.toFixed(2)}</p>
+                    <p className="text-lg font-bold">{formatCurrency(expense.amount, currency)}</p>
                     <Button
                       variant="ghost"
                       size="icon"

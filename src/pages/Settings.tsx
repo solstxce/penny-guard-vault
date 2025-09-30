@@ -22,15 +22,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Download, Upload, Trash2, DollarSign } from "lucide-react";
+import { Download, Upload, Trash2, DollarSign, Moon, Sun } from "lucide-react";
 import { EXPENSE_CATEGORIES } from "@/types/expense";
 import { exportData, importData, clearAllData } from "@/utils/storage";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import { formatCurrency, Currency, CURRENCIES } from "@/utils/currency";
+import { useTheme } from "next-themes";
 
 export default function Settings() {
-  const { budgets, setBudget } = useExpenses();
+  const { budgets, setBudget, currency, setCurrency } = useExpenses();
   const { password, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [budgetAmount, setBudgetAmount] = useState("");
 
@@ -100,8 +103,61 @@ export default function Settings() {
   };
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6">
       <h2 className="text-3xl font-bold">Settings</h2>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Appearance</CardTitle>
+          <CardDescription>Customize your app appearance</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Theme</Label>
+            <div className="flex gap-2">
+              <Button
+                variant={theme === "light" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTheme("light")}
+              >
+                <Sun className="mr-2 h-4 w-4" />
+                Light
+              </Button>
+              <Button
+                variant={theme === "dark" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTheme("dark")}
+              >
+                <Moon className="mr-2 h-4 w-4" />
+                Dark
+              </Button>
+              <Button
+                variant={theme === "system" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTheme("system")}
+              >
+                System
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="currency">Currency</Label>
+            <Select value={currency} onValueChange={(value) => setCurrency(value as Currency)}>
+              <SelectTrigger id="currency">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(CURRENCIES).map(([code, { symbol, name }]) => (
+                  <SelectItem key={code} value={code}>
+                    {symbol} {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -143,7 +199,7 @@ export default function Settings() {
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                   <span className="font-medium">{category}</span>
                 </div>
-                <span className="text-sm">${amount.toFixed(2)}</span>
+                <span className="text-sm">{formatCurrency(amount, currency)}</span>
               </div>
             ))}
             {Object.keys(budgets).length === 0 && (
